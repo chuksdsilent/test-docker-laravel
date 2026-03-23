@@ -1,39 +1,40 @@
-FROM php:8.2 as php
+FROM php:8.2-fpm
 
-RUN apt-get update -y
-RUN apt-get install -y unzip libpq-dev libcurl4-gnutls-dev
-RUN docker-php-ext-install pdo pdo_mysql bcmath
-RUN docker-php-ext-configure pcntl --enable-pcntl \
-  && docker-php-ext-install pcntl;
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    nginx \
+    git \
+    curl \
+    unzip \
+    libzip-dev \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev
 
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
 
-#RUN pecl install -o -f redis \
-#    && rm -rf /tmp/pear \
-#    && docker-php-ext-enable redis
-
-
-WORKDIR /app
-COPY . .
-
-RUN ls -l ./docker/entrypoint.sh
-RUN  chmod +x ./docker/entrypoint.sh
-
-RUN echo "max_execution_time = 300" >> /usr/local/etc/php/php.ini
-
-
+# Install Composer
 COPY --from=composer:2.7.4 /usr/bin/composer /usr/bin/composer
 
-ENV PORT=8000
-ENTRYPOINT [ "./docker/entrypoint.sh" ]
+# Configure Nginx
+COPY nginx.conf /etc/nginx/sites-available/default
 
-# ==============================================================================
-#  node
-#FROM node:14-alpine as node
-#
-#WORKDIR /var/www
-#COPY . .
-#
-#RUN npm install --global cross-env
-#RUN npm install
-#
-#VOLUME /var/www/node_modules
+# Set working directory
+WORKDIR /var/www
+
+# Copy Laravel project
+COPY laravel /var/www
+
+# Install Laravel dependencies
+RUN composer install
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www/storage
+
+# Expose port
+EXPOSE 80
+
+# Start PHP-FPM and Nginx
+CMD service nginx start && php-fpm
