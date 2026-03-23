@@ -12,8 +12,6 @@ else
     echo "env file exists."
 fi
 
-
-
 role=${CONTAINER_ROLE:-app}
 echo role
 if [ "$role" = "app" ]; then

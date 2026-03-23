@@ -24,7 +24,7 @@ COPY nginx.conf /etc/nginx/sites-available/default
 WORKDIR /var/www
 
 # Copy Laravel project
-COPY laravel /var/www
+COPY . /var/www/laravel
 
 # Install Laravel dependencies
 RUN composer install
