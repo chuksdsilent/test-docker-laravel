@@ -30,8 +30,8 @@ COPY . /var/www/laravel
 RUN composer install
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage
+RUN chown -R www-data:www-data /var/www/laravel \
+    && chmod -R 775 /var/www/laravel/storage
 
 # Expose port
 EXPOSE 80

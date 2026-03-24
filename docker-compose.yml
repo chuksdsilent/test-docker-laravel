@@ -39,8 +39,7 @@ services:
             - PHP_POST_MAX_SIZE=20M
         working_dir: /app
         volumes:
-            - ./:/app
-            - ./laravel:/var/www
+            - ./:/var/www/laravel
         ports:
             - 8030:8000
         depends_on:
