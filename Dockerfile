@@ -21,7 +21,7 @@ COPY --from=composer:2.7.4 /usr/bin/composer /usr/bin/composer
 COPY nginx.conf /etc/nginx/sites-available/default
 
 # Set working directory
-WORKDIR /var/www
+WORKDIR /var/www/laravel
 
 # Copy Laravel project
 COPY . /var/www/laravel
@@ -36,5 +36,6 @@ RUN chown -R www-data:www-data /var/www \
 # Expose port
 EXPOSE 80
 
-# Start PHP-FPM and Nginx
-CMD service nginx start && php-fpm
+
+# Start PHP-FPM in background, then run nginx in foreground
+CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
